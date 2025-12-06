@@ -6,6 +6,9 @@ services:
       POSTGRES_USER: vijay
       POSTGRES_PASSWORD: vijay
       PGDATA: /var/lib/postgresql/data/pgdata
+      TZ: Asia/Kolkata
+      PGTZ: Asia/Kolkata
+      POSTGRES_DB: product
 
     volumes:
       - postgres:/var/lib/postgresql/data
