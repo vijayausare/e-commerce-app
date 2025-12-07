@@ -1,4 +1,4 @@
-package com.vijay.discovery;
+package com.vijay.ecommerce.discovery;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

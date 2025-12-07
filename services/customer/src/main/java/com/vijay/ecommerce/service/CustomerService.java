@@ -1,8 +1,8 @@
 package com.vijay.ecommerce.service;
 
-import com.vijay.ecommerce.customer.Customer;
-import com.vijay.ecommerce.customer.CustomerRequest;
-import com.vijay.ecommerce.customer.CustomerResponse;
+import com.vijay.ecommerce.client.Customer;
+import com.vijay.ecommerce.client.CustomerRequest;
+import com.vijay.ecommerce.client.CustomerResponse;
 import com.vijay.ecommerce.exception.CustomerNotFoundException;
 import com.vijay.ecommerce.mapper.CustomerMapper;
 import com.vijay.ecommerce.repository.CustomerRepository;

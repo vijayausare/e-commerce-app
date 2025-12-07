@@ -1,7 +1,7 @@
 package com.vijay.ecommerce.controller;
 
-import com.vijay.ecommerce.customer.CustomerRequest;
-import com.vijay.ecommerce.customer.CustomerResponse;
+import com.vijay.ecommerce.client.CustomerRequest;
+import com.vijay.ecommerce.client.CustomerResponse;
 import com.vijay.ecommerce.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

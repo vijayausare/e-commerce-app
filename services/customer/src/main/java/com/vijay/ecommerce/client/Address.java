@@ -1,7 +1,6 @@
-package com.vijay.ecommerce.customer;
+package com.vijay.ecommerce.client;
 
 import lombok.*;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.validation.annotation.Validated;
 
 @AllArgsConstructor

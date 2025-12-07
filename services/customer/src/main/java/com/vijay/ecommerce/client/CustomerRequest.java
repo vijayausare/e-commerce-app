@@ -1,4 +1,4 @@
-package com.vijay.ecommerce.customer;
+package com.vijay.ecommerce.client;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
