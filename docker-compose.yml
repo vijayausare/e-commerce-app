@@ -91,6 +91,9 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, PLAINTEXT_HOST:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
 
+    networks:
+      - microservices-net
+
   mail-dev:
     container_name: ms_mail_dev
     image: maildev/maildev
