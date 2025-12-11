@@ -14,6 +14,8 @@ import com.vijay.ecommerce.order.PurchaseRequest;
 import com.vijay.ecommerce.orderLine.OrderLine;
 import com.vijay.ecommerce.orderLine.OrderLineRequest;
 import com.vijay.ecommerce.orderLine.OrderLineService;
+import com.vijay.ecommerce.payment.PaymentClient;
+import com.vijay.ecommerce.payment.PaymentRequest;
 import com.vijay.ecommerce.repository.OrderRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ public class OrderService {
 
     private final OrderLineService orderLineService;
     private final OrderProducer orderProducer;
+    private final PaymentClient paymentClient;
 
     public Integer createOrder(OrderRequest request) {
 
@@ -56,7 +59,14 @@ public class OrderService {
             );
         }
 
-        // TODO Start payment
+        var paymentRequest = new PaymentRequest(
+                request.amount(),
+                request.paymentMethod(),
+                order.getId(),
+                order.getReference(),
+                customer
+        );
+        paymentClient.requestOrderPayment(paymentRequest);
 
         // sent notifications
         orderProducer.sendOrderConfirmation(
