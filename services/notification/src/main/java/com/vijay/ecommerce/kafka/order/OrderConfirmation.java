@@ -1,5 +1,6 @@
 package com.vijay.ecommerce.kafka.order;
 
+
 import com.vijay.ecommerce.kafka.payment.PaymentMethod;
 
 import java.math.BigDecimal;
@@ -11,5 +12,6 @@ public record OrderConfirmation(
         PaymentMethod paymentMethod,
         Customer customer,
         List<Product> products
+
 ) {
 }

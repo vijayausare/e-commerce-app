@@ -2,7 +2,12 @@ package com.vijay.ecommerce.notification;
 
 import com.vijay.ecommerce.kafka.order.OrderConfirmation;
 import com.vijay.ecommerce.kafka.payment.PaymentConfirmation;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -18,9 +23,8 @@ public class Notification {
 
     @Id
     private String id;
-
     private NotificationType type;
-    private LocalDateTime notificationTime;
+    private LocalDateTime notificationDate;
     private OrderConfirmation orderConfirmation;
     private PaymentConfirmation paymentConfirmation;
 }
