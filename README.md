@@ -47,7 +47,7 @@ docker compose up -d
 | pgAdmin | 5050 | PostgreSQL UI (`pgadmin4@pgadmin.org` / `admin`) |
 | MongoDB | 27017 | Customer and notification data (user/password: `vijay`) |
 | Mongo Express | 8081 | MongoDB UI |
-| Kafka / Zookeeper | 9092 / 22181 | Event messaging |
+| Kafka (KRaft, no Zookeeper) | 9092 | Event messaging |
 | Zipkin | 9411 | Distributed tracing |
 | MailDev | 1080 (UI), 1025 (SMTP) | Catches emails sent by the notification service |
 
