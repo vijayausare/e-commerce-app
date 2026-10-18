@@ -27,3 +27,16 @@ spring:
           uri: lb:http://PAYMENT-SERVICE
           predicates:
             - Path=/api/v1/payments/**
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: customer
+        url: /CUSTOMER-SERVICE/v3/api-docs
+      - name: product
+        url: /PRODUCT-SERVICE/v3/api-docs
+      - name: order
+        url: /ORDER-SERVICE/v3/api-docs
+      - name: payment
+        url: /PAYMENT-SERVICE/v3/api-docs

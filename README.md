@@ -93,3 +93,29 @@ Example flow:
 ```bash
 docker compose down        # add -v to also delete the stored data
 ```
+
+## Testing the APIs
+
+- **Swagger UI (all services):** http://localhost:8222/swagger-ui.html. Use the dropdown at the top to switch between customer, product, order and payment.
+- **Per-service Swagger UI:** http://localhost:8090/swagger-ui.html (customer), 8050 (product), 8070 (order), 8060 (payment).
+- **Ready-made requests:** [api-tests.http](api-tests.http) works with the IntelliJ HTTP client or the VS Code "REST Client" extension.
+
+### API list (through the gateway, port 8222)
+
+| Method | Path | Description |
+|---|---|---|
+| POST | `/api/v1/customers` | Create customer (returns id) |
+| PUT | `/api/v1/customers` | Update customer |
+| GET | `/api/v1/customers` | List customers |
+| GET | `/api/v1/customers/{id}` | Get customer |
+| GET | `/api/v1/customers/exists/{id}` | Check that a customer exists |
+| DELETE | `/api/v1/customers/{id}` | Delete customer |
+| PUT | `/api/v1/products` | Create product |
+| POST | `/api/v1/products/purchase` | Purchase products (reduces stock) |
+| GET | `/api/v1/products` | List products |
+| GET | `/api/v1/products/{id}` | Get product |
+| POST | `/api/v1/orders` | Create order (calls customer, product and payment, publishes a Kafka event) |
+| GET | `/api/v1/orders` | List orders |
+| GET | `/api/v1/orders/{id}` | Get order |
+| GET | `/api/v1/order-lines/order/{orderId}` | Order lines of an order |
+| POST | `/api/v1/payments` | Create payment |

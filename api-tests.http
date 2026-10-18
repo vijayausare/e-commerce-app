@@ -1,0 +1,113 @@
+### Sample requests for the IntelliJ HTTP client or the VS Code "REST Client" extension.
+### All calls go through the gateway (port 8222).
+
+@host = http://localhost:8222
+
+### ---------- Customers (MongoDB) ----------
+
+### Create customer (returns the new customer id)
+POST {{host}}/api/v1/customers
+Content-Type: application/json
+
+{
+  "firstName": "Vijay",
+  "lastName": "Ausare",
+  "email": "vijay@example.com",
+  "address": { "street": "Main St", "houseNumber": "12", "zipCode": "411001" }
+}
+
+### List customers
+GET {{host}}/api/v1/customers
+
+### Get one customer (replace the id)
+GET {{host}}/api/v1/customers/PUT_CUSTOMER_ID_HERE
+
+### Check that a customer exists
+GET {{host}}/api/v1/customers/exists/PUT_CUSTOMER_ID_HERE
+
+### Update customer (id is required in the body)
+PUT {{host}}/api/v1/customers
+Content-Type: application/json
+
+{
+  "id": "PUT_CUSTOMER_ID_HERE",
+  "firstName": "Vijay",
+  "lastName": "Ausare",
+  "email": "vijay.new@example.com",
+  "address": { "street": "Main St", "houseNumber": "12", "zipCode": "411001" }
+}
+
+### Delete customer
+DELETE {{host}}/api/v1/customers/PUT_CUSTOMER_ID_HERE
+
+### ---------- Products (PostgreSQL, seeded by Flyway) ----------
+
+### List products
+GET {{host}}/api/v1/products
+
+### Get one product
+GET {{host}}/api/v1/products/1
+
+### Create product (this endpoint uses PUT; categoryId must exist, 1-5 are seeded)
+PUT {{host}}/api/v1/products
+Content-Type: application/json
+
+{
+  "name": "Test Keyboard",
+  "description": "Created from api-tests.http",
+  "availableQuantity": 50,
+  "price": 59.99,
+  "categoryId": 1
+}
+
+### Purchase products (reduces stock)
+POST {{host}}/api/v1/products/purchase
+Content-Type: application/json
+
+[
+  { "productId": 1, "quantity": 2 }
+]
+
+### ---------- Orders ----------
+
+### Create order. Needs a real customerId and product ids; also triggers payment and the Kafka emails
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+
+{
+  "reference": "ORD-001",
+  "amount": 199.98,
+  "paymentMethod": "VISA",
+  "customerId": "PUT_CUSTOMER_ID_HERE",
+  "products": [
+    { "productId": 1, "quantity": 2 }
+  ]
+}
+
+### List orders
+GET {{host}}/api/v1/orders
+
+### Get one order
+GET {{host}}/api/v1/orders/1
+
+### Order lines of an order
+GET {{host}}/api/v1/order-lines/order/1
+
+### ---------- Payments ----------
+
+### Create payment directly (normally called by the order service)
+POST {{host}}/api/v1/payments
+Content-Type: application/json
+
+{
+  "amount": 199.98,
+  "paymentMethod": "VISA",
+  "orderId": 1,
+  "orderReference": "ORD-001",
+  "customer": {
+    "id": "PUT_CUSTOMER_ID_HERE",
+    "firstName": "Vijay",
+    "lastName": "Ausare",
+    "email": "vijay@example.com"
+  }
+}
