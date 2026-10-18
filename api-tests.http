@@ -48,8 +48,8 @@ GET {{host}}/api/v1/products
 ### Get one product
 GET {{host}}/api/v1/products/1
 
-### Create product (this endpoint uses PUT; categoryId must exist, 1-5 are seeded)
-PUT {{host}}/api/v1/products
+### Create product (categoryId must exist, 1-5 are seeded)
+POST {{host}}/api/v1/products
 Content-Type: application/json
 
 {

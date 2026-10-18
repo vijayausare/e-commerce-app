@@ -8,6 +8,12 @@ services:
       PGDATA: /data/postgres
     volumes:
       - postgres:/data/postgres
+      - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vijay"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     ports:
       - "5432:5432"
     networks:
@@ -47,6 +53,8 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=vijay
       - MONGO_INITDB_ROOT_PASSWORD=vijay
+    networks:
+      - microservices-net
 
   mongo-express:
     image: mongo-express
@@ -58,6 +66,8 @@ services:
       - ME_CONFIG_MONGODB_ADMINUSERNAME=vijay
       - ME_CONFIG_MONGODB_ADMINPASSWORD=vijay
       - ME_CONFIG_MONGODB_SERVER=mongodb
+    networks:
+      - microservices-net
 
   kafka:
     image: apache/kafka:3.7.0
@@ -69,10 +79,11 @@ services:
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_LISTENERS: PLAINTEXT://:9092,INTERNAL://:29092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,INTERNAL://kafka:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
@@ -87,6 +98,188 @@ services:
     ports:
       - 1080:1080
       - 1025:1025
+    networks:
+      - microservices-net
+
+  config-server:
+    build: ./services/config-server
+    container_name: ms_config-server
+    ports:
+      - "8888:8888"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/8888' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    restart: on-failure
+    networks:
+      - microservices-net
+
+  discovery:
+    build: ./services/discovery
+    container_name: ms_discovery
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/8761' || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    depends_on:
+      config-server:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - microservices-net
+
+  customer:
+    build: ./services/customer
+    container_name: ms_customer
+    ports:
+      - "8090:8090"
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka
+      EUREKA_INSTANCE_HOSTNAME: customer
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_DATA_MONGODB_HOST: mongodb
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+    restart: on-failure
+    networks:
+      - microservices-net
+
+  product:
+    build: ./services/product
+    container_name: ms_product
+    ports:
+      - "8050:8050"
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka
+      EUREKA_INSTANCE_HOSTNAME: product
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql:5432/product
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - microservices-net
+
+  order:
+    build: ./services/order
+    container_name: ms_order
+    ports:
+      - "8070:8070"
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka
+      EUREKA_INSTANCE_HOSTNAME: order
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql:5432/order
+      SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka:29092
+      APPLICATION_CONFIG_CUSTOMER_URL: http://gateway:8222/api/v1/customers
+      APPLICATION_CONFIG_PAYMENT_URL: http://gateway:8222/api/v1/payments
+      APPLICATION_CONFIG_PRODUCT_URL: http://gateway:8222/api/v1/products
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    restart: on-failure
+    networks:
+      - microservices-net
+
+  payment:
+    build: ./services/payment
+    container_name: ms_payment
+    ports:
+      - "8060:8060"
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka
+      EUREKA_INSTANCE_HOSTNAME: payment
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql:5432/payment
+      SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka:29092
+      APPLICATION_CONFIG_PRODUCT_URL: http://gateway:8222/api/v1/products
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery:
+        condition: service_healthy
+      postgresql:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    restart: on-failure
+    networks:
+      - microservices-net
+
+  notification:
+    build: ./services/notification
+    container_name: ms_notification
+    ports:
+      - "8040:8040"
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka
+      EUREKA_INSTANCE_HOSTNAME: notification
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_MAIL_HOST: mail-dev
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      kafka:
+        condition: service_started
+      mail-dev:
+        condition: service_started
+    restart: on-failure
+    networks:
+      - microservices-net
+
+  gateway:
+    build: ./services/gateway
+    container_name: ms_gateway
+    ports:
+      - "8222:8222"
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka
+      EUREKA_INSTANCE_HOSTNAME: gateway
+      MANAGEMENT_ZIPKIN_TRACING_ENDPOINT: http://zipkin:9411/api/v2/spans
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - microservices-net
 
 networks:
   microservices-net:

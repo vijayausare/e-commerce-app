@@ -1,9 +1,10 @@
 package com.vijay.ecommerce.product;
 
+import com.vijay.ecommerce.exception.ProductPurchaseException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,57 +14,59 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
+
     private final ProductRepository repository;
     private final ProductMapper mapper;
 
-    public Integer createProduct(ProductRequest request) {
+    public Integer createProduct(
+            ProductRequest request
+    ) {
         var product = mapper.toProduct(request);
         return repository.save(product).getId();
     }
 
-    public List<ProductPurchaseResponse> purchaseProducts(List<ProductPurchaseRequest> request) {
-        var productIds = request.stream()
-                .map(ProductPurchaseRequest::productId)
-                .toList();
-
-        var storedproducts = repository.findAllByIdInOrderById(productIds);
-
-        if(productIds.size() != storedproducts.size()) {
-            throw new ProductPurchaseException("One or more Product does not exists");
-        }
-
-        var storedRequests = request.stream()
-                .sorted(Comparator.comparing(ProductPurchaseRequest::productId))
-                .toList();
-
-        var purchaedProducts = new ArrayList<ProductPurchaseResponse>();
-
-        for(int i = 0; i < storedRequests.size(); i++) {
-            var product = storedproducts.get(i);
-            var productRequest = storedRequests.get(i);
-
-            if(product.getAvailableQuantity()< productRequest.quantity()) {
-                throw new ProductPurchaseException("Insufficient stock quantity for  product with ID::"+ productRequest.productId());
-            }
-
-            var newAvailableQuantity = product.getAvailableQuantity() - productRequest.quantity();
-            product.setAvailableQuantity(newAvailableQuantity);
-            repository.save(product);
-
-            purchaedProducts.add(mapper.toProductPurchaseResponse(product, productRequest.quantity()));
-        }
-
-        return purchaedProducts;
-    }
-
-    public ProductResponse findById(Integer productId) {
-        return repository.findById(productId).map(mapper::fromProduct)
-                .orElseThrow(()-> new EntityNotFoundException("Product not found with ID::"+ productId));
+    public ProductResponse findById(Integer id) {
+        return repository.findById(id)
+                .map(mapper::toProductResponse)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with ID:: " + id));
     }
 
     public List<ProductResponse> findAll() {
-        return repository.findAll().stream()
-                .map(mapper::fromProduct)
+        return repository.findAll()
+                .stream()
+                .map(mapper::toProductResponse)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(rollbackFor = ProductPurchaseException.class)
+    public List<ProductPurchaseResponse> purchaseProducts(
+            List<ProductPurchaseRequest> request
+    ) {
+        var productIds = request
+                .stream()
+                .map(ProductPurchaseRequest::productId)
+                .toList();
+        var storedProducts = repository.findAllByIdInOrderById(productIds);
+        if (productIds.size() != storedProducts.size()) {
+            throw new ProductPurchaseException("One or more products does not exist");
+        }
+        var sortedRequest = request
+                .stream()
+                .sorted(Comparator.comparing(ProductPurchaseRequest::productId))
+                .toList();
+        var purchasedProducts = new ArrayList<ProductPurchaseResponse>();
+        for (int i = 0; i < storedProducts.size(); i++) {
+            var product = storedProducts.get(i);
+            var productRequest = sortedRequest.get(i);
+            if (product.getAvailableQuantity() < productRequest.quantity()) {
+                throw new ProductPurchaseException("Insufficient stock quantity for product with ID:: " + productRequest.productId());
+            }
+            var newAvailableQuantity = product.getAvailableQuantity() - productRequest.quantity();
+            product.setAvailableQuantity(newAvailableQuantity);
+            repository.save(product);
+            purchasedProducts.add(mapper.toproductPurchaseResponse(product, productRequest.quantity()));
+        }
+        return purchasedProducts;
+    }
+
 }

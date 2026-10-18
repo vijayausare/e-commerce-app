@@ -1,7 +1,6 @@
 package com.vijay.ecommerce.product;
 
 import com.vijay.ecommerce.category.Category;
-import jakarta.validation.constraints.Positive;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,16 +10,17 @@ public class ProductMapper {
                 .id(request.id())
                 .name(request.name())
                 .description(request.description())
-                .price(request.price())
                 .availableQuantity(request.availableQuantity())
+                .price(request.price())
                 .category(
                         Category.builder()
                                 .id(request.categoryId())
-                                .build())
+                                .build()
+                )
                 .build();
     }
 
-    public ProductResponse fromProduct(Product product) {
+    public ProductResponse toProductResponse(Product product) {
         return new ProductResponse(
                 product.getId(),
                 product.getName(),
@@ -33,7 +33,7 @@ public class ProductMapper {
         );
     }
 
-    public ProductPurchaseResponse toProductPurchaseResponse(Product product, double quantity) {
+    public ProductPurchaseResponse toproductPurchaseResponse(Product product, double quantity) {
         return new ProductPurchaseResponse(
                 product.getId(),
                 product.getName(),

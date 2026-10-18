@@ -1,6 +1,5 @@
 package com.vijay.ecommerce.kafka.order;
 
-
 import com.vijay.ecommerce.kafka.payment.PaymentMethod;
 
 import java.math.BigDecimal;

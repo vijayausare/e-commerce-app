@@ -1,49 +1,60 @@
 package com.vijay.ecommerce.order;
 
-import com.vijay.ecommerce.enums.PaymentMethod;
-import com.vijay.ecommerce.orderLine.OrderLine;
-import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
+import com.vijay.ecommerce.orderline.OrderLine;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
 @Getter
 @Setter
 @Entity
 @EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor
 @Table(name = "customer_order")
 public class Order {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
-    private String reference;
+  @Id
+  @GeneratedValue
+  private Integer id;
 
-    private BigDecimal totalAmount;
+  @Column(unique = true,  nullable = false)
+  private String reference;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod;
+  private BigDecimal totalAmount;
 
-    private String customerId;
+  @Enumerated(EnumType.STRING)
+  private PaymentMethod paymentMethod;
 
-    @OneToMany(mappedBy = "order")
-    private List<OrderLine> orderLines;
+  private String customerId;
 
-    @CreatedDate
-    @Column(updatable = false, nullable = false)
-    private LocalDateTime createAt;
+  @OneToMany(mappedBy = "order")
+  private List<OrderLine> orderLines;
 
-    @LastModifiedDate
-    @Column(updatable = false)
-    private LocalDateTime lastModifiedDate;
+  @CreatedDate
+  @Column(updatable = false, nullable = false)
+  private LocalDateTime createdDate;
 
+  @LastModifiedDate
+  @Column(insertable = false)
+  private LocalDateTime lastModifiedDate;
 }

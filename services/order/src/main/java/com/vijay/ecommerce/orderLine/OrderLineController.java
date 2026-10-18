@@ -1,6 +1,6 @@
-package com.vijay.ecommerce.orderLine;
+package com.vijay.ecommerce.orderline;
 
-import com.vijay.ecommerce.repository.OrderLineRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +19,8 @@ public class OrderLineController {
 
     @GetMapping("/order/{order-id}")
     public ResponseEntity<List<OrderLineResponse>> findByOrderId(
-            @PathVariable("order-id") Integer orderId) {
+            @PathVariable("order-id") Integer orderId
+    ) {
         return ResponseEntity.ok(service.findAllByOrderId(orderId));
     }
-
 }

@@ -110,7 +110,7 @@ docker compose down        # add -v to also delete the stored data
 | GET | `/api/v1/customers/{id}` | Get customer |
 | GET | `/api/v1/customers/exists/{id}` | Check that a customer exists |
 | DELETE | `/api/v1/customers/{id}` | Delete customer |
-| PUT | `/api/v1/products` | Create product |
+| POST | `/api/v1/products` | Create product |
 | POST | `/api/v1/products/purchase` | Purchase products (reduces stock) |
 | GET | `/api/v1/products` | List products |
 | GET | `/api/v1/products/{id}` | Get product |
@@ -119,3 +119,27 @@ docker compose down        # add -v to also delete the stored data
 | GET | `/api/v1/orders/{id}` | Get order |
 | GET | `/api/v1/order-lines/order/{orderId}` | Order lines of an order |
 | POST | `/api/v1/payments` | Create payment |
+
+## Run everything with one command
+
+From the repo root in PowerShell:
+
+```powershell
+.\run-all.ps1
+```
+
+This starts only the infrastructure containers, creates the missing Postgres databases, and opens one window per service in the right order. To stop, close those windows and run `docker compose down`.
+
+## Run everything in Docker
+
+Every service has a `Dockerfile`, and `docker-compose.yml` builds and starts all of them together with the infrastructure:
+
+```bash
+docker compose up -d --build
+```
+
+The first build takes several minutes. Services start in dependency order (config-server, then discovery, then the rest), and the gateway is at http://localhost:8222. Inside the containers the service URLs, database hosts and Kafka address are overridden with environment variables in the compose file, so the config-server YAMLs keep working with `localhost` for IDE runs.
+
+- Do not run `run-all.ps1` or the Maven services at the same time, because the ports clash.
+- The `product`, `order` and `payment` databases are created from `docker/postgres-init.sql`, but only when the Postgres volume is first created. On an existing volume, run `docker compose down -v` once.
+- View logs with `docker compose logs -f order`. Stop everything with `docker compose down`.
