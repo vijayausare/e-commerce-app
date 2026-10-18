@@ -3,6 +3,7 @@
 A Spring Boot microservice application built for learning. Services are discovered through Eureka, configured centrally by Spring Cloud Config, and exposed through a Spring Cloud Gateway. Order and payment events are sent over Kafka, and the notification service sends the resulting emails.
 
 ## Architecture
+![img_1.png](img_1.png)
 
 | Service | Port | Storage | Role |
 |---|---|---|---|
