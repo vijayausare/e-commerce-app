@@ -5,39 +5,26 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.0</version>
+		<version>3.2.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.vijay</groupId>
+	<groupId>com.alibou</groupId>
 	<artifactId>notification</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>notification</name>
-	<description>notification</description>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<description>Notification project</description>
 	<properties>
-		<java.version>21</java.version>
-		<spring-cloud.version>2025.1.0</spring-cloud.version>
+		<java.version>17</java.version>
+		<spring-cloud.version>2023.0.1</spring-cloud.version>
 	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-kafka</artifactId>
+			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -48,6 +35,10 @@
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
 		</dependency>
@@ -55,30 +46,27 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-brave</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb-test</artifactId>
-			<scope>test</scope>
+			<groupId>io.zipkin.reporter2</groupId>
+			<artifactId>zipkin-reporter-brave</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-kafka-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-mail-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf-test</artifactId>
+			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -97,28 +85,8 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</path>
-					</annotationProcessorPaths>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
