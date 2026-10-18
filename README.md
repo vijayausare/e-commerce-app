@@ -42,9 +42,9 @@ docker compose up -d
 
 | Container | Port | Purpose |
 |---|---|---|
-| PostgreSQL | 5432 | Product, order and payment data (user/password: `alibou`) |
+| PostgreSQL | 5432 | Product, order and payment data (user/password: `vijay`) |
 | pgAdmin | 5050 | PostgreSQL UI (`pgadmin4@pgadmin.org` / `admin`) |
-| MongoDB | 27017 | Customer and notification data (user/password: `alibou`) |
+| MongoDB | 27017 | Customer and notification data (user/password: `vijay`) |
 | Mongo Express | 8081 | MongoDB UI |
 | Kafka / Zookeeper | 9092 / 22181 | Event messaging |
 | Zipkin | 9411 | Distributed tracing |
@@ -53,9 +53,9 @@ docker compose up -d
 The PostgreSQL container does not create the databases. Create `product`, `order` and `payment` before starting those services, for example in pgAdmin at http://localhost:5050 or with:
 
 ```bash
-docker exec -it ms_pg_sql psql -U alibou -c "CREATE DATABASE product;"
-docker exec -it ms_pg_sql psql -U alibou -c "CREATE DATABASE \"order\";"
-docker exec -it ms_pg_sql psql -U alibou -c "CREATE DATABASE payment;"
+docker exec -it ms_pg_sql psql -U vijay -c "CREATE DATABASE product;"
+docker exec -it ms_pg_sql psql -U vijay -c "CREATE DATABASE \"order\";"
+docker exec -it ms_pg_sql psql -U vijay -c "CREATE DATABASE payment;"
 ```
 
 ## Running the services
