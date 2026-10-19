@@ -10,8 +10,8 @@ POST {{host}}/api/v1/customers
 Content-Type: application/json
 
 {
-  "firstName": "Vijay",
-  "lastName": "Ausare",
+  "firstname": "Vijay",
+  "lastname": "Ausare",
   "email": "vijay@example.com",
   "address": { "street": "Main St", "houseNumber": "12", "zipCode": "411001" }
 }
@@ -31,8 +31,8 @@ Content-Type: application/json
 
 {
   "id": "PUT_CUSTOMER_ID_HERE",
-  "firstName": "Vijay",
-  "lastName": "Ausare",
+  "firstname": "Vijay",
+  "lastname": "Ausare",
   "email": "vijay.new@example.com",
   "address": { "street": "Main St", "houseNumber": "12", "zipCode": "411001" }
 }
@@ -106,8 +106,8 @@ Content-Type: application/json
   "orderReference": "ORD-001",
   "customer": {
     "id": "PUT_CUSTOMER_ID_HERE",
-    "firstName": "Vijay",
-    "lastName": "Ausare",
+    "firstname": "Vijay",
+    "lastname": "Ausare",
     "email": "vijay@example.com"
   }
 }
